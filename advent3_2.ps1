@@ -5,12 +5,13 @@ $columns =  $input[0].Length
 $columns
 $gamma = ""
 $epsilon = ""
+$list = [System.Collections.ArrayList]@()
 #[convert]::ToString(63,2)
 #[convert]::ToInt32('1000000',2)
 for($j = 0; $j -lt $columns; $j++){
     $zeros = 0
     $ones = 0
-    for($i = 0; $i -lt $length; $i++){
+    for($i = 0; $i -lt $length; $i++
         $bit = $input[$i].Substring($j,1)
         if($bit -eq "0"){
             $zeros += 1
@@ -18,15 +19,6 @@ for($j = 0; $j -lt $columns; $j++){
         if($bit -eq "1"){
             $ones += 1
         }
-    }
-    if($zeros -gt $ones){
-        $gamma += "0"
-        $epsilon += "1"
-    }
-    if($zeros -lt $ones){
-        $gamma += "1"
-        $epsilon += "0"
-    }
  
 } 
 Write-output "This is gamma "$gamma
@@ -40,6 +32,26 @@ $gamma_int * $epsilon_int
 
 
 
+function CommonBitIsTrue(){
+    param($list,$column)
+    $zeros = 0
+    $ones = 0
+    $length = ($list | Measure-Object).count
+    $returnlist = [System.Collections.ArrayList]@()
+    for($i = 0; $i -lt $length; $i++){
+        $bit = $input[$i].Substring($j,1)
+        if($bit -eq "0"){
+            $zeros += 1
+        }
+        if($bit -eq "1"){
+            $ones += 1
+        }
+    }
+    if($ones -gt $zeros){
+        $output = $true 
+    }
+    return $output
+}
 
 
 #0
