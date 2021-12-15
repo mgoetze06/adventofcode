@@ -12,6 +12,7 @@ $input[0].Substring(0,1)
 newfunction
 for($i = 0; $i -lt $length; $i++){
     newfunction
+    #new comment
 } 
 
 
