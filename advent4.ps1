@@ -2,7 +2,7 @@
 $length = ($input | Measure-Object).count
 $input[0].Substring(0,1)
 
-
+#small changes
 [convert]::ToString(63,2)
 
 [convert]::ToInt32('1000000',2)
