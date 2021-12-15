@@ -24,7 +24,7 @@ $raw_lines = [System.Collections.ArrayList]@()
 
 $boards = [System.Collections.ArrayList]@()
 #$array = New-Object 'object[,]' 5,5
-for($j = 0; $j -lt 31; $j++){
+for($j = 0; $j -lt 100; $j++){
     $linecount = 2 + $j*6
     $array = [System.Collections.ArrayList]@()
     for($i = $linecount; $i -lt ($linecount+5); $i++){
@@ -40,5 +40,5 @@ for($j = 0; $j -lt 31; $j++){
 }
 #$boards[0]
 #$boards[1]
-
-draw -allboards $boards -index 30
+($boards | Measure-Object).count
+draw -allboards $boards -index 5
