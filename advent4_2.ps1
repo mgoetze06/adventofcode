@@ -54,7 +54,8 @@ for($j = 0; $j -lt 100; $j++){
 
 #$marked_boards[99][0][0] = "1"
 #draw -allboards $marked_boards -index 99
-
+$winner = 0
+$unique_winners = [System.Collections.ArrayList]@()
 :number for($n = 0; $n -lt $totalnumbers; $n++){
     #checkhit -allboards $boards -allmarkedboards $marked_boards -number $numbers[$j]
     for($a = 0; $a -lt 100; $a++){
@@ -70,23 +71,40 @@ for($j = 0; $j -lt 100; $j++){
             }
         }
         #check if board is winner
-        $winner = -1
-        for($i = 0; $i -lt 5; $i++){
-            if(($marked_boards[$a][$i][0] -eq "1")-and($marked_boards[$a][$i][1] -eq "1")-and($marked_boards[$a][$i][2] -eq "1")-and($marked_boards[$a][$i][3] -eq "1")-and($marked_boards[$a][$i][4] -eq "1")){
-                #board is winner
-                $winner = $a
+        #$winner = -1
+        $needschecking = $false
+        :unique for($u = 0; $u -lt ($unique_winners | Measure-Object).count;$u++){
+            if(($a -eq $unique_winners[$u])-and($needschecking -eq $false)){
+                #already won, not checking
+                $needschecking = $false
+            }else{
+                #will need to check if won
+                $needschecking = $true
+                break unique
             }
         }
-        for($j = 0; $j -lt 5; $j++){
-            if(($marked_boards[$a][0][$j] -eq "1")-and($marked_boards[$a][1][$j] -eq "1")-and($marked_boards[$a][2][$j] -eq "1")-and($marked_boards[$a][3][$j] -eq "1")-and($marked_boards[$a][4][$j] -eq "1")){
-                #board is winner
-                $winner = $a
-            }
+        if($needschecking -eq $false){
+                for($i = 0; $i -lt 5; $i++){
+                    if(($marked_boards[$a][$i][0] -eq "1")-and($marked_boards[$a][$i][1] -eq "1")-and($marked_boards[$a][$i][2] -eq "1")-and($marked_boards[$a][$i][3] -eq "1")-and($marked_boards[$a][$i][4] -eq "1")){
+                        #board is winner
+                        $winner += 1
+                        $unique_winners += ,@($a)
+                    }
+                }
+                for($j = 0; $j -lt 5; $j++){
+                    if(($marked_boards[$a][0][$j] -eq "1")-and($marked_boards[$a][1][$j] -eq "1")-and($marked_boards[$a][2][$j] -eq "1")-and($marked_boards[$a][3][$j] -eq "1")-and($marked_boards[$a][4][$j] -eq "1")){
+                        #board is winner
+                        $winner += 1
+                        $unique_winners += ,@($a)
+                    }
+                }
         }
-        if($winner -gt -1){
+        if($winner -eq 99){
             $winningNumber = $numbers[$n]
             break number
         }
+        Write-Output "Unique winners"
+        $unique_winners
     }
     
 }
@@ -105,3 +123,7 @@ for($i = 0; $i -lt 5; $i++){
     }
 }
 $sum_notmarked * $winningNumber
+
+#draw -allboards $marked_boards -index 2
+#draw -allboards $marked_boards -index 57
+#draw -allboards $marked_boards -index 88
