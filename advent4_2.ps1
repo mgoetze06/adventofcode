@@ -54,6 +54,7 @@ for($j = 0; $j -lt 100; $j++){
 
 #$marked_boards[99][0][0] = "1"
 #draw -allboards $marked_boards -index 99
+($boards | Measure-Object).count
 $winner = 0
 $unique_winners = [System.Collections.ArrayList]@()
 :number for($n = 0; $n -lt $totalnumbers; $n++){
@@ -72,53 +73,74 @@ $unique_winners = [System.Collections.ArrayList]@()
         }
         #check if board is winner
         #$winner = -1
-        $needschecking = $false
+        $a_is_already_winner = $false
+
         :unique for($u = 0; $u -lt ($unique_winners | Measure-Object).count;$u++){
-            if(($a -eq $unique_winners[$u])-and($needschecking -eq $false)){
-                #already won, not checking
-                $needschecking = $false
-            }else{
-                #will need to check if won
-                $needschecking = $true
-                break unique
+            if($a -eq $unique_winners[$u]){
+                $a_is_already_winner = $true
             }
+
+
+            #if(($a -eq $unique_winners[$u])-and($needschecking -eq $false)){
+            #    #already won, not checking
+            #    $needschecking = $false
+            #}else{
+            #    #will need to check if won
+            #    $needschecking = $true
+            #    break unique
+            #}
         }
-        if($needschecking -eq $false){
+        if($a_is_already_winner -eq $false){
                 for($i = 0; $i -lt 5; $i++){
                     if(($marked_boards[$a][$i][0] -eq "1")-and($marked_boards[$a][$i][1] -eq "1")-and($marked_boards[$a][$i][2] -eq "1")-and($marked_boards[$a][$i][3] -eq "1")-and($marked_boards[$a][$i][4] -eq "1")){
                         #board is winner
                         $winner += 1
-                        $unique_winners += ,@($a)
+                        $unique_winners += $a
+                        $a_is_already_winner = $true
                     }
                 }
-                for($j = 0; $j -lt 5; $j++){
-                    if(($marked_boards[$a][0][$j] -eq "1")-and($marked_boards[$a][1][$j] -eq "1")-and($marked_boards[$a][2][$j] -eq "1")-and($marked_boards[$a][3][$j] -eq "1")-and($marked_boards[$a][4][$j] -eq "1")){
-                        #board is winner
-                        $winner += 1
-                        $unique_winners += ,@($a)
-                    }
+                if($a_is_already_winner -eq $false){
+                    for($j = 0; $j -lt 5; $j++){
+                        if(($marked_boards[$a][0][$j] -eq "1")-and($marked_boards[$a][1][$j] -eq "1")-and($marked_boards[$a][2][$j] -eq "1")-and($marked_boards[$a][3][$j] -eq "1")-and($marked_boards[$a][4][$j] -eq "1")){
+                            #board is winner
+                            $winner += 1
+                            $unique_winners += $a
+                        }
+                    } 
                 }
+
         }
-        if($winner -eq 99){
-            $winningNumber = $numbers[$n]
-            break number
-        }
+        #if($winner -eq 99){
+        #    $winningNumber = $numbers[$n]
+        #    break number
+        #}
+
+    }
+    Write-Output "winner board count"
+    ($unique_winners | Measure-Object).count
+    if(($unique_winners | Measure-Object).count -eq 100){
+        $winningNumber = $numbers[$n]
+        break number
+    }
+}
         Write-Output "Unique winners"
         $unique_winners
-    }
-    
-}
+        Write-Output "Unique winners length"
+        ($unique_winners | Measure-Object).count
+        $unique_winners[99]
+
+
 Write-Output "winning number: $winningNumber"
-draw -allboards $marked_boards -index $winner
-draw -allboards $boards -index $winner
+draw -allboards $marked_boards -index $unique_winners[99]
+draw -allboards $boards -index $unique_winners[99]
 #draw -allboards $marked_boards -index 5
 #draw -allboards $boards -index 5
 
 $sum_notmarked = 0
 for($i = 0; $i -lt 5; $i++){
     for($j = 0; $j -lt 5; $j++){
-        if($marked_boards[$winner][$i][$j] -eq "0"){
-            $sum_notmarked += [int]$boards[$winner][$i][$j]
+        if($marked_boards[$unique_winners[99]][$i][$j] -eq "0"){
+            $sum_notmarked += [int]$boards[$unique_winners[99]][$i][$j]
         }
     }
 }
