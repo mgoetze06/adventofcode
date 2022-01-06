@@ -10,7 +10,7 @@ for($i = 0; $i -lt 1000; $i++){ #loop over each position
     for($j = 0; $j -lt $crab_count; $j++){
         $steps = [math]::Abs($crabs[$j] - $i)
         $fuel_consumption = 0
-        for($s = 1; $s -lt $steps; $s++){
+        for($s = 1; $s -lt $steps+1; $s++){
             $fuel_consumption += $s
         }
         $total_fuel += $fuel_consumption
