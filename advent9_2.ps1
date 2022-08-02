@@ -1,7 +1,214 @@
 ﻿$global:input = Get-Content "input9.txt"
 $global:low_points = [System.Collections.ArrayList]@()
 $global:basin_points = [System.Collections.ArrayList]@()
+$global:basin_points_temp = [System.Collections.ArrayList]@()
 $global:count = 0
+
+
+function printPointWithHeight($arr){
+	Write-Output ""
+	Write-Output "printing Array of points with height"
+	Write-Output "i   j   (height)"
+	$length = ($arr | Measure-Object).Count
+	Write-Output "number of points in basin: $length"
+	#$arr[0]
+	#$arr[0][0]
+	#$arr[0][1]
+    for($k = 0; $k -lt $length; $k++){
+		$i = $arr[$k][0]
+		$j = $arr[$k][1]
+		$height = $global:input[$i][$j]
+		Write-Output "i: $i j: $j  ($height)"
+	}
+	Write-Output ""
+}
+
+function checkNBasin($i,$j){
+	
+	$points_to_add= [System.Collections.ArrayList]@()
+	
+    Write-Output "Basin: checking neighbor of $i $j"
+    $i = [int]$i
+    $j = [int]$j
+    $current = $global:input[$i][$j]
+    if($i -gt 0){
+        $temp = $i-1
+        $i_before = $global:input[$temp][$j]
+    }
+    if($i -lt 99){
+        $temp = $i+1
+        $i_next = $global:input[$temp][$j]
+    }
+    if($j -gt 0){
+        $temp = $j-1
+        $j_before = $global:input[$i][$temp]
+    }
+    if($j -lt 99){
+        $temp = $j+1
+        $j_next = $global:input[$i][$temp]
+    }
+    [int]$idiff = 0
+    [int]$jdiff = 0
+	
+	$temp1 = $i+1
+	$temp2 = $i-1
+	$temp3 = $j+1
+	$temp4 = $j+1
+	
+	
+	if($i -eq 0){
+        if($j -eq 0){
+        #obere linke ecke
+			if(($i_next -gt $current)-and($i_next -ne 9)){
+				$points_to_add += ,@($temp1,$j)
+			}
+            if(($j_next -gt $current)-and($j_next -ne 9)){
+               $points_to_add += ,@($i,$temp3)
+            }
+        }elseif($j -eq 99){
+        #obere rechte ecke
+            if(($i_next -gt $current)-and($i_next -ne 9)){
+               $points_to_add += ,@($temp1,$j)
+            }
+
+            if(($j_before -gt $current)-and($j_before -ne 9)){
+               $points_to_add += ,@($i,$temp4)
+            }
+
+        }else{
+        #obere zeile ohne ecke
+            if(($i_next -gt $current)-and($i_next -ne 9)){
+               $points_to_add += ,@($temp1,$j) 
+            }
+
+            if(($j_before -gt $current)-and($j_before -ne 9)){
+               $points_to_add += ,@($i,$temp4)
+            }
+            if(($j_next -gt $current)-and($j_next -ne 9)){
+               $points_to_add += ,@($i,$temp3)
+            }
+        }
+    }elseif($i -eq 99){
+        if($j -eq 0){
+        #untere linke ecke
+ 
+            if(($i_before -gt $current)-and($i_before -ne 9)){
+               $points_to_add += ,@($temp2,$j)
+            }
+
+            if(($j_next -gt $current)-and($j_next -ne 9)){
+               $points_to_add += ,@($i,$temp3)
+            }
+        }elseif($j -eq 99){
+        #untere rechte ecke
+
+            if(($i_before -gt $current)-and($i_before -ne 9)){
+               $points_to_add += ,@($temp2,$j)
+            }
+            if(($j_before -gt $current)-and($j_before -ne 9)){
+               $points_to_add += ,@($i,$temp4)
+            }
+
+        }else{
+        #untere zeile ohne ecke
+            if(($i_before -gt $current)-and($i_before -ne 9)){
+               $points_to_add += ,@($temp2,$j)
+            }
+            if(($j_before -gt $current)-and($j_before -ne 9)){
+               $points_to_add += ,@($i,$temp4)
+            }
+            if(($j_next -gt $current)-and($j_next -ne 9)){
+               $points_to_add += ,@($i,$temp3)
+            }
+        }
+    }elseif($j -eq 0){
+        #linke spagte ohne ecke
+            if(($i_next -gt $current)-and($i_next -ne 9)){
+				
+               $points_to_add += ,@($temp1,$j) 
+            }
+            if(($i_before -gt $current)-and($i_before -ne 9)){
+				
+               $points_to_add += ,@($temp2,$j) 
+            }
+            #if($j_before -gt $current){
+            #   $jdiff = -1 
+            #}
+            if(($j_next -gt $current)-and($j_next -ne 9)){
+               $points_to_add += ,@($i,$temp3) 
+            }
+    }elseif($j -eq 99){
+        #rechte spagte ohne ecke
+            if(($i_next -gt $current)-and($i_next -ne 9)){
+               $points_to_add += ,@($temp1,$j)
+            }
+            if(($i_before -gt $current)-and($j_before -ne 9)){
+               $points_to_add += ,@($temp2,$j) 
+            }
+            if(($j_before -gt $current)-and($j_before -ne 9)){
+               $points_to_add += ,@($i,$temp4) 
+            }
+            #if($j_next -gt $current){
+            #   $jdiff = 1 
+            #}
+    }else{
+        #alles andere
+            if(($i_next -gt $current)-and($i_next -ne 9)){
+               $points_to_add += ,@($temp1,$j)
+            }
+            if(($i_before -gt $current)-and($i_before -ne 9)){
+               $points_to_add += ,@($temp2,$j)
+            }
+            if(($j_before -gt $current)-and($j_before -ne 9)){
+               $points_to_add += ,@($i,$temp4)
+            }
+            if(($j_next -gt $current)-and($j_next -ne 9)){
+               $points_to_add += ,@($i,$temp3)
+            }
+
+
+    }
+	$points_to_add
+	$length3 = ($points_to_add| Measure-Object).Count
+	$length3
+	for($k = 0; $k -lt $length3; $k++){
+		$length2 = ($global:basin_points_temp| Measure-Object).Count
+		if ($length2 -gt 0){
+			$addpoint = $False
+			for($m = 0; $m -lt $length2; $m++){
+				if(($global:basin_points_temp[$m][0] -eq $points_to_add[$k][0])-and($global:basin_points_temp[$m][1] -eq $points_to_add[$k][1])){
+					#do not add point
+				else{
+					$addpoint = $True
+				}
+				}
+			}
+			If($addpoint){
+				$global:basin_points_temp += ,@($points_to_add[$k])
+			}
+		}else{
+			$global:basin_points_temp += ,@($points_to_add[$k])
+		}
+	}
+	
+	#$alreadyThere = $false
+	#$length = ($global:basin_points_temp| Measure-Object).Count
+	#:outer for($k = 0; $k -lt $length; $k++){
+	#		if(($global:basin_points_temp[$k][0] -eq $i)-and($global:basin_points_temp[$k][1] -eq $j)){
+	#		$alreadyThere = $true
+	#		break outer
+	#	}
+
+	#}
+	#if($alreadyThere -eq $false){
+	#	$global:basin_points_temp += ,@($i,$j) 
+	#	checkNBasin $tempi $tempj
+	#}      
+
+
+}
+
+
 function checkN($i,$j){
     Write-Output "checking neighbor of $i $j"
     $i = [int]$i
@@ -431,8 +638,9 @@ function checkbasin($i,$j){
             if(($global:basin_points[$k][0] -eq $tempi)-and($global:basin_points[$k][1] -eq $tempj)){
                 $alreadyThere = $true
 				Write-Output "basin point already there"
+				printPointWithHeight($global:basin_points)
 				#Write-Output "all basin points: $global:basin_points"
-				$versuche_left = 0
+				#$versuche_left = 0
                 break outer
             }
             
@@ -443,7 +651,7 @@ function checkbasin($i,$j){
             #$global:basin_points += ,@($i,$j)
 			$global:basin_points += ,@($tempi,$tempj)
 			$global:basin_length += 1
-			
+			printPointWithHeight($global:basin_points)
 			#$global:basin_length
 			#($global:basin_points| Measure-Object).Count
 			#Write-Output "all points:"
@@ -556,7 +764,6 @@ $global:low_points[0]
 $global:basin_length = 0
 $length = ($global:low_points| Measure-Object).Count
 $total = 0
-Write-Output "calculating total"
 #for($i = 0; $i -lt $length; $i++){
     #Write-Output "koord"
     #[int]$global:low_points[$i][0]
@@ -571,8 +778,18 @@ Write-Output "calculating total"
 #    $total += $currentHeight
 #}
 #$total
+
+ 
+Write-Output "checking N basins"
+checkNBasin $global:low_points[0][0] $global:low_points[0][1]
+printPointWithHeight($global:basin_points_temp)
+break
+
+
+
 Write-Output "checking basins"
 #for($i = 0; $i -lt $length; $i++){
+$global:basin_points += ,@($global:low_points[0][0],$global:low_points[0][1])
 checkbasin $global:low_points[0][0] $global:low_points[0][1]
 #}
 $global:basin_length
