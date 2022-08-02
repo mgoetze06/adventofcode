@@ -29,7 +29,7 @@ function checkN($i,$j){
     if($i -eq 0){
         if($j -eq 0){
         #obere linke ecke
-            if($i_next -lt $current){
+		if($i_next -lt $current){
                $idiff = 1 
             }
             #if($i_before -lt $current){
@@ -217,7 +217,7 @@ function checkbasin($i,$j){
     $ignore_jnext = $false
     $ignore_jbefore = $false
     while($versuche_left -ne 0){
-    $versuche_left
+	Write-Output "Versuche left: $versuche_left"
     if($i -eq 0){
         if($j -eq 0){
         #obere linke ecke
@@ -338,16 +338,20 @@ function checkbasin($i,$j){
         }
     }elseif($j -eq 0){
         Write-Output "linke spalte"
+		Write-Output "current: $current"
+		Write-Output "inext: $i_next  ibefore: $i_before  jnext: $j_next  jbefore: $j_before"
         #linke spalte ohne ecke
             if(($i_next -ge $current) -and ($i_next -ne 9)-and($ignore_inext -eq $false)){
                $idiff = 1 
                $ignore_inext = $true
                $versuche_left -= 1
+			   Write-Output "linke spalte1"
             }
             elseif(($i_before -ge $current) -and ($i_before -ne 9)-and($ignore_ibefore -eq $false)){
                $idiff = -1 
                $ignore_ibefore = $true
                $versuche_left -= 1
+			   Write-Output "linke spalte2"
             }
             #if($j_before -lt $current){
             #   $jdiff = -1 
@@ -356,8 +360,10 @@ function checkbasin($i,$j){
                $jdiff = 1 
                $ignore_jnext = $true
                $versuche_left -= 1
+			   Write-Output "linke spalte3"
             }
-    }elseif($j -eq 99){
+		Write-Output "idiff: $idiff ,jdiff: $jdiff"
+    }elseif($j	-eq 99){
     Write-Output "rechte spalte"
         #rechte spalte ohne ecke
             if(($i_next -ge $current) -and ($i_next -ne 9)-and($ignore_inext -eq $false)){
@@ -414,25 +420,59 @@ function checkbasin($i,$j){
 
 
     }else{
+		Write-Output "i: $i ,j: $j"
         [int]$tempi = $i + $idiff
         [int]$tempj = $j + $jdiff
-        $tempi
-        $tempj
+		Write-Output "tempi:  $tempi , tempj: $tempj"
         $alreadyThere = $false
         $length = ($global:basin_points| Measure-Object).Count
+		$length
         :outer for($k = 0; $k -lt $length; $k++){
             if(($global:basin_points[$k][0] -eq $tempi)-and($global:basin_points[$k][1] -eq $tempj)){
                 $alreadyThere = $true
+				Write-Output "basin point already there"
+				#Write-Output "all basin points: $global:basin_points"
+				$versuche_left = 0
                 break outer
             }
             
 
         }
         if($alreadyThere -eq $false){
-            $global:basin_points += ,@($i,$j)
-            checkbasin $tempi $tempj 
+			Write-Output "need to add point to basin points ($tempi,$tempj)"
+            #$global:basin_points += ,@($i,$j)
+			$global:basin_points += ,@($tempi,$tempj)
+			$global:basin_length += 1
+			
+			#$global:basin_length
+			#($global:basin_points| Measure-Object).Count
+			#Write-Output "all points:"
+			
+            #checkbasin $i $j 
         }  
+		
+		
+		 if($tempi -gt 0){
+			$temp = $tempi-1
+			$i_before = $global:input[$temp][$tempj]
+		}
+		if($tempi -lt 99){
+			$temp = $tempi+1
+			$i_next = $global:input[$temp][$tempj]
+		}
+		if($tempj -gt 0){
+			$temp = $tempj-1
+			$j_before = $global:input[$tempi][$temp]
+		}
+		if($tempj -lt 99){
+			$temp = $tempj+1
+			$j_next = $global:input[$tempi][$temp]
+		}
+		$current = $global:input[$tempi][$tempj]
+		Write-Output "i: $i ,j: $j"
 
+		Write-Output "tempi:  $tempi , tempj: $tempj"
+		
         #($global:low_points| Measure-Object).Count
         
     }
@@ -501,34 +541,38 @@ for($i = 0; $i -lt $rows; $i++){
     }
 }
 #$global:low_points
+Write-Output "total lowpoints"
 ($global:low_points| Measure-Object).Count
+Write-Output "low point 0"
+$global:low_points[0][0]
+$global:low_points[0][1]
+Write-Output ""
 $global:low_points[0]
-$global:low_points[1]
-$global:low_points[2]
-$global:low_points[3]
 #$global:low_points[1][0]
 #$global:low_points[1][1]
 #$global:count
 
 
+$global:basin_length = 0
 $length = ($global:low_points| Measure-Object).Count
 $total = 0
 Write-Output "calculating total"
-for($i = 0; $i -lt $length; $i++){
+#for($i = 0; $i -lt $length; $i++){
     #Write-Output "koord"
     #[int]$global:low_points[$i][0]
     #[int]$global:low_points[$i][1]
     #$input[3][0]
-    $currentHeight = [convert]::ToInt32($input[$global:low_points[$i][0]][$global:low_points[$i][1]],10)
+#    $currentHeight = [convert]::ToInt32($input[$global:low_points[$i][0]][$global:low_points[$i][1]],10)
     #Write-Output "currentheigt"
     #$currentHeight
     #Write-Output "currentheigt + 1"
-    $currentHeight += 1
+#    $currentHeight += 1
     #$currentHeight
-    $total += $currentHeight
-}
-$total
+#    $total += $currentHeight
+#}
+#$total
 Write-Output "checking basins"
-for($i = 0; $i -lt $length; $i++){
-       checkbasin $global:low_points[$i][0] $global:low_points[$i][1]
-}
+#for($i = 0; $i -lt $length; $i++){
+checkbasin $global:low_points[0][0] $global:low_points[0][1]
+#}
+$global:basin_length
