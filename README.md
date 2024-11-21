@@ -1,2 +1,2 @@
 # adventofcode
-participation in advent of code on https://adventofcode.com/2021
+participation in advent of code on https://adventofcode.com
