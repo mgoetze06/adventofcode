@@ -34,7 +34,7 @@ function isDigit{
     $isDigit
 }
 
-function getStartingDigitPositions{
+function getDigitPositions{
     param($symbolposition, $data)
 
     $output = @()
@@ -67,6 +67,45 @@ function getStartingDigitPositions{
     $output
 }
 
+
+function getNumberFromPosition(){
+    param($digitposition, $data, $usedPositions)
+
+
+    $row = $digitposition[0]
+    $col = $digitposition[1]
+
+    $startrow = $row
+    $startcol = $col
+    $currentChar = $data[$row][$col]
+    Write-Host "Current Digit: $currentChar"
+    $output = ""
+    $isDigit = isDigit -char $currentChar | select -last 1
+    while($isDigit){
+
+        $output = $output + $data[$row][$col]
+        $col = $col + 1
+        $currentChar = $data[$row][$col]
+        $isDigit = isDigit -char $currentChar | select -last 1
+
+    }
+    
+    $col = $startcol - 1
+    $currentChar = $data[$row][$col]
+    $isDigit = isDigit -char $currentChar | select -last 1
+    while($isDigit){
+
+        $output = $data[$row][$col]+ $output
+        $col = $col - 1
+        $currentChar = $data[$row][$col]
+        $isDigit = isDigit -char $currentChar | select -last 1
+
+    }
+
+    Write-Warning "Output String: $output"
+    $output
+}
+
 $symbols = @()
 
 $file = "31_val.txt"
@@ -93,14 +132,30 @@ Write-HOst "Symbols index 01: $first"
 
 
 $startingDigitPositions = @()
+$usedPositions = @()
+$numbers = @()
 
 for($i = 0; $i -lt $symbols.Length; $i++){
     $s = $symbols[$i]
     #Write-HOst "Symbols index $i : $s"
-    [array]$arr = getStartingDigitPositions -symbolposition $s -data $input
-    $positionsToCheck += ,($s,$arr)
+    [array]$arr = getDigitPositions -symbolposition $s -data $input
+    [array]$positionsToCheck += ,($arr)
 } 
 for($i = 0; $i -lt $positionsToCheck.Length; $i++){
     $s = $positionsToCheck[$i]
-    Write-HOst "Digit Positions index $i : $s"
+    $numbers = @()
+    Write-HOst "Digit Positions index $i"
+    if($positionsToCheck[$i][0].Length -eq 1){
+        Write-Host "got only one position"
+        $number = getNumberFromPosition -digitposition $positionsToCheck[$i] -data $input | select -last 1
+    }else{
+        for($j = 0; $j -lt $positionsToCheck[$i].Length; $j++){
+            $position = $positionsToCheck[$i][$j]
+            Write-HOst "Position $j : $position"
+            $number = getNumberFromPosition -digitposition $position -data $input | select -last 1
+        }
+    }
+    
+
+
 } 
