@@ -1,11 +1,12 @@
 def isSymbol(char):
-    if char == ".":
+    if char == "*":
+        return True
+    else:
         return False
+    # if isDigit(char):
+    #     return False
     
-    if isDigit(char):
-        return False
-    
-    return True
+    #return True
 
 def isDigit(char):
     if(char == "1" or char == "2" or char == "3" or char == "4" or char == "5" or char == "6" or char == "7" or char == "8" or char == "9" or char == "0"):
@@ -45,7 +46,7 @@ def getNumberFromDigitPosition(digitPosition,data,usedPositions):
     maxRows = len(data)
 
     if [row,col] in usedPositions:
-        return 0,usedPositions
+        return -1,usedPositions
     
     outputString = ""
     currentChar = data[startrow][startcol]
@@ -97,11 +98,16 @@ print(digitPositions)
 usedPositions =[]
 total = 0 
 for digitsPerSymbol in digitPositions:
+    gearratio = None
+    numbers = []
     for digitPosition in digitsPerSymbol:
         print(digitPosition)
         number,usedPositions = getNumberFromDigitPosition(digitPosition,lines,usedPositions)
-        print(number)
-        total += number
+        if number != -1:
+            numbers.append(number)
+
+    if len(numbers) == 2:
+        total += numbers[0]*numbers[1]
 
 
 print(total)
