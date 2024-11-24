@@ -71,6 +71,7 @@ function getDigitPositions{
 function getNumberFromPosition(){
     param($digitposition, $data, $usedPositions)
 
+    $usedPositions = @()
 
     $row = $digitposition[0]
     $col = $digitposition[1]
@@ -82,7 +83,7 @@ function getNumberFromPosition(){
     $output = ""
     $isDigit = isDigit -char $currentChar | select -last 1
     while($isDigit){
-
+        $usedPositions += ,($row,$col)
         $output = $output + $data[$row][$col]
         $col = $col + 1
         $currentChar = $data[$row][$col]
@@ -94,7 +95,7 @@ function getNumberFromPosition(){
     $currentChar = $data[$row][$col]
     $isDigit = isDigit -char $currentChar | select -last 1
     while($isDigit){
-
+        $usedPositions += ,($row,$col)
         $output = $data[$row][$col]+ $output
         $col = $col - 1
         $currentChar = $data[$row][$col]
@@ -103,7 +104,57 @@ function getNumberFromPosition(){
     }
 
     Write-Warning "Output String: $output"
+    $usedPositions
     $output
+
+}
+
+function isNewPosition(){
+    param($newpositions,$positions)
+    $new = $true
+    $length = ($positions | Measure-Object).count
+
+    if($length -eq 0){
+        $new = $true
+        [array]$positions = $newpositions
+
+        Write-Host $positions
+        $positions
+        $new
+
+        return
+    }
+    Write-Host "isNewPosition: $newpositions"
+    #Write-Host "Positions: $positions"
+    if($newpositions[0].Length -eq 1){
+        Write-Host "Length is 0"
+        :test for($i = 0; $i -lt $length; $i++){
+            if($newpositions[0] -eq $positions[$i][0] -and $newpositions[1] -eq $positions[$i][1]){
+                $new = $false
+                break :test
+            }
+            $positions += ,($newpositions[0],$newpositions[1])
+        }
+    }
+    else{
+        for($j = 0; $j -lt $newpositions[$i].Length; $j++){
+            :test for($i = 0; $i -lt $length; $i++){
+                if($newpositions[$j][0] -eq $positions[$i][0] -and $newpositions[$j][1] -eq $positions[$i][1]){
+                    $new = $false
+                    break :test
+                }
+
+
+            }
+            $x = $newpositions[$j][0]
+            $y = $newpositions[$j][1]
+            Write-Host "New Position $x $y"
+            $positions += ,($newpositions[$j][0],$newpositions[$j][1])
+        }
+    }
+
+    $positions
+    $new
 }
 
 $symbols = @()
@@ -132,8 +183,9 @@ Write-HOst "Symbols index 01: $first"
 
 
 $startingDigitPositions = @()
-$usedPositions = @()
+$allPositions = @()
 $numbers = @()
+$total = 0
 
 for($i = 0; $i -lt $symbols.Length; $i++){
     $s = $symbols[$i]
@@ -147,15 +199,39 @@ for($i = 0; $i -lt $positionsToCheck.Length; $i++){
     Write-HOst "Digit Positions index $i"
     if($positionsToCheck[$i][0].Length -eq 1){
         Write-Host "got only one position"
-        $number = getNumberFromPosition -digitposition $positionsToCheck[$i] -data $input | select -last 1
+        $result = getNumberFromPosition -digitposition $positionsToCheck[$i] -data $input
+        [int]$number = $result | select -last 1
+        $usedPositions = $result | select -SkipLast 1
+        Write-Host "Number: $number"
+        Write-Host "Used Positions: $usedPositions"
+        $result = isNewPosition -newposition $usedPositions -positions $allPositions
+        [bool]$isNew = $result | select -last 1
+        $allPositions = $result | select -SkipLast 1
+        if($isNew){
+            Write-Host "Found New Number" -ForegroundColor Green
+
+            $total += $number
+        }
     }else{
         for($j = 0; $j -lt $positionsToCheck[$i].Length; $j++){
             $position = $positionsToCheck[$i][$j]
             Write-HOst "Position $j : $position"
-            $number = getNumberFromPosition -digitposition $position -data $input | select -last 1
+            $result = getNumberFromPosition -digitposition $position -data $input
+            [int]$number = $result | select -last 1
+            $usedPositions = $result | select -SkipLast 1
+            Write-Host "Number: $number"
+            Write-Host "Used Positions: $usedPositions"
+            $result = isNewPosition -newposition $usedPositions -positions $allPositions
+            [bool]$isNew = $result | select -last 1
+            $allPositions = $result | select -SkipLast 1
+            if($isNew){
+                Write-Host "Found New Number" -ForegroundColor Green
+                $total += $number
+            }
         }
     }
     
 
 
 } 
+$total
