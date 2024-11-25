@@ -1,5 +1,5 @@
 import re
-with open('51_val.txt') as f:
+with open('51.txt') as f:
     lines = f.read().splitlines()
 
 print("total rows: ",len(lines))
@@ -23,11 +23,11 @@ class TransformationMap:
 
     def runOnPoint(self,point):
         for rule in self.rules:
-
-            ruleOffset = rule.destinationRange - rule.sourceRange
+            #ruleOffset = rule.destinationRange - rule.sourceRange
             newvalue = point
-            if rule.sourceRange < point < rule.sourceRange + rule.rangeLength:
-                newvalue = point + ruleOffset
+            if rule.sourceRange <= point < (rule.sourceRange + rule.rangeLength):
+                newvalue = rule.destinationRange + point - rule.sourceRange
+                #print("applied Rule: ",rule.print())
                 return newvalue
         return newvalue
 
@@ -52,13 +52,14 @@ for line in lines[1:]:
     else:
         if not line == "":
             line_split = line.split(" ")
-            if len(line_split) > 1:
+            if len(line_split) > 2:
                 d = line_split[0]
                 s = line_split[1]
                 l = line_split[2]
                 r = Rule(d,s,l)
                 rules.append(r)
-
+m = TransformationMap(index,rules)
+maps.append(m)
     
 
       
@@ -71,6 +72,14 @@ for m in maps:
     for rule in m.rules:
         rule.print()
 
+outputMatrix = [seeds]
 
-for seed in seeds:
-    print(maps[0].runOnPoint(seed))
+for id,map in enumerate(maps):
+    newOutput = []
+    for i,seed in enumerate(seeds):
+        newOutput.append(maps[id].runOnPoint(outputMatrix[id][i]))
+    outputMatrix.append(newOutput)
+
+for i,output in enumerate(outputMatrix):
+    print(f"id {i}:",output)
+print(min(outputMatrix[7]))
