@@ -11,7 +11,21 @@ seeds = lines[0].split("seeds: ")[1].split(" ")
 seeds = [int(x) for x in seeds]
 print(seeds)
 
+allseeds = []
+for id,value in enumerate(seeds):
+    print(id,value)
+    if id % 2 == 0:
+        start = value
+        rangeFromStart = seeds[id+1]
+        print("start",start)
+        print("rangeFromStart",rangeFromStart)
 
+        for i in range(start,start+rangeFromStart):
+            allseeds.append(i)
+    
+
+seeds = allseeds
+print(seeds)
 
 class TransformationMap:
     def __init__(self, index, rules):
