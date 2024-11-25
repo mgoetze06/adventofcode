@@ -19,13 +19,23 @@ class TransformationMap:
         self.index = index
     def print(self):
         print(f"Map {self.index}({self.rules})")
+    
 
+    def runOnPoint(self,point):
+        for rule in self.rules:
+
+            ruleOffset = rule.destinationRange - rule.sourceRange
+            newvalue = point
+            if rule.sourceRange < point < rule.sourceRange + rule.rangeLength:
+                newvalue = point + ruleOffset
+                return newvalue
+        return newvalue
 
 class Rule:
     def __init__(self, destinationRange, sourceRange, rangeLength):
-        self.destinationRange = destinationRange
-        self.sourceRange = sourceRange
-        self.rangeLength = rangeLength
+        self.destinationRange = int(destinationRange)
+        self.sourceRange = int(sourceRange)
+        self.rangeLength = int(rangeLength)
     def print(self):
         print(f"Rule {self.destinationRange} {self.sourceRange} {self.rangeLength}")
 
@@ -60,3 +70,7 @@ for m in maps:
     print(m.print())
     for rule in m.rules:
         rule.print()
+
+
+for seed in seeds:
+    print(maps[0].runOnPoint(seed))
