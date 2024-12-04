@@ -125,16 +125,20 @@ def getSurroundingCharacters(position):
     b = lines[row-1][col+1]
     c = lines[row+1][col-1]
     d = lines[row+1][col+1]
-    #print([a,b],[c,d])
-    if (a == b and c == d and a != c) or (a == c and b == d and a != b):
 
-        if (not "." in a) and (not "." in b) and (not "." in c) and (not "." in d) and (not "X" in a) and (not "X" in b) and (not "X" in c) and (not "X" in d): 
-            print([a,b],[c,d])
-            print("valid")
-            return True
-        else:
-            print([a,b],[c,d])
-            print("invalid due to .")
+    diag1= []
+    diag1.append(a)
+    diag1.append(d)
+    diag1.sort()
+    diag2= []
+    diag2.append(c)
+    diag2.append(b)
+    diag2.sort()
+    #print([a,b],[c,d])
+    #print(diag1)
+    #print(diag2)
+    if diag1 == ["M","S"] and diag2 == ["M","S"]:
+        return True
 
 
     return False
@@ -156,9 +160,9 @@ def part_two(positions):
     sum = 0
     validPositions = []
     for position in positions:
-        print("")
-        print("")
-        print("new position: ",position)
+        #print("")
+        #print("")
+        #print("new position: ",position)
         getSurroundingCharacters(position)
         if getSurroundingCharacters(position) == True:
             validPositions.append(position)
