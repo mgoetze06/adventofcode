@@ -5,7 +5,7 @@ print("total rows: ",len(lines))
 #print(lines[0])
 
 #lines = ["....." + l.strip() + "....." for l in lines]
-lines = ["....." + l + "....." for l in lines]
+lines = ["....." + l.strip() + "....." for l in lines]
 
 paddingRow = "".join(["." for l in lines[0]])
 print(paddingRow)
@@ -54,66 +54,126 @@ def addDirectionToPosition(localposition,direction):
     else:
         return localposition
 
-allXPositions = []
-for indexRow,line in enumerate(lines):
-    #line = line.rstrip()
-    #print(line)
-    indicesOfX = re.finditer(r"X",line)
-    indicesOfX = [ind.start() for ind in indicesOfX]
-    for index in indicesOfX:
-        #print(index)
-        allXPositions.append([indexRow,index])
-    output = ""
-    for indexCol,char in enumerate(line):
-        #print("char",char)
-        #print("indexChar",indexChar)
-        if indexCol in indicesOfX:
-            output += "X"
-        else:
-            output += "."
+def getCharacterPositions(regex):
+    allXPositions = []
+    for indexRow,line in enumerate(lines):
+        #line = line.rstrip()
+        #print(line)
+        indicesOfX = re.finditer(regex,line)
+        indicesOfX = [ind.start() for ind in indicesOfX]
+        for index in indicesOfX:
+            #print(index)
+            allXPositions.append([indexRow,index])
+        output = ""
+        for indexCol,char in enumerate(line):
+            #print("char",char)
+            #print("indexChar",indexChar)
+            if indexCol in indicesOfX:
+                output += regex
+            else:
+                output += "."
 
-    print(output)
+        print(indexRow,output)
+    return allXPositions
 
-
-#print(allXPositions)
-#directions = [[1,0],[1,1],[1,-1]]
-directions = []
-chars = ['X','M','A','S','']
-for rowOffset in range(-1,2,1):
-    for colOffset in range(-1,2,1):
-        directions.append([rowOffset,colOffset])
-#print(directions)
-xmasFound = 0
-for position in allXPositions:
-    print("")
-    print("position: ",position)
-    print("")
-    for direction in directions:
-        charsFound = 0
-        found = False
-        positionToCheck = position
-        print("checking direction: ",direction)
-        charAtPosition = getCharFromPosition(positionToCheck,lines)
-        print("char at position",charAtPosition)
-        while  charAtPosition == chars[charsFound] and not found:
-            print("charsFound ",charsFound)
-            positionToCheck = addDirectionToPosition(positionToCheck,direction)
-            print("newposition",positionToCheck)
+def part_one(allXPositions):
+    #print(allXPositions)
+    #directions = [[1,0],[1,1],[1,-1]]
+    directions = []
+    chars = ['X','M','A','S','']
+    for rowOffset in range(-1,2,1):
+        for colOffset in range(-1,2,1):
+            directions.append([rowOffset,colOffset])
+    #print(directions)
+    xmasFound = 0
+    for position in allXPositions:
+        #print("")
+        #print("position: ",position)
+        #print("")
+        for direction in directions:
+            charsFound = 0
+            found = False
+            positionToCheck = position
+            #print("checking direction: ",direction)
             charAtPosition = getCharFromPosition(positionToCheck,lines)
-            print("char at position",charAtPosition)
-            charsFound += 1
-            if charsFound == len(chars)-1:
-                print("found XMAS in direction",direction)
-                xmasFound += 1
-                found = True
-            
+            #print("char at position",charAtPosition)
+            while  charAtPosition == chars[charsFound] and not found:
+                #print("charsFound ",charsFound)
+                positionToCheck = addDirectionToPosition(positionToCheck,direction)
+                #print("newposition",positionToCheck)
+                charAtPosition = getCharFromPosition(positionToCheck,lines)
+                #print("char at position",charAtPosition)
+                charsFound += 1
+                if charsFound == len(chars)-1:
+                    #print("found XMAS in direction",direction)
+                    xmasFound += 1
+                    found = True
+    return xmasFound
 
-        #if charsFound == len(chars)-1:
-            
-        #else:
-        #    print("no XMAS in direction",direction)
+def getSurroundingCharacters(position):
+    if len(position) != 2:
+        return False
+    
+    row = position[0]
+    col = position[1]
+    #0 1 2 3
 
-print(xmasFound)
+    #a-b
+    #-A-
+    #c-d
+    a = lines[row-1][col-1]
+    b = lines[row-1][col+1]
+    c = lines[row+1][col-1]
+    d = lines[row+1][col+1]
+    #print([a,b],[c,d])
+    if (a == b and c == d and a != c) or (a == c and b == d and a != b):
+
+        if (not "." in a) and (not "." in b) and (not "." in c) and (not "." in d) and (not "X" in a) and (not "X" in b) and (not "X" in c) and (not "X" in d): 
+            print([a,b],[c,d])
+            print("valid")
+            return True
+        else:
+            print([a,b],[c,d])
+            print("invalid due to .")
 
 
-            
+    return False
+
+def visual_part_two(positions):
+    for indexRow,line in enumerate(lines):
+        output = ""
+        for indexCol,char in enumerate(line):
+            found = False
+            for position in positions:
+                if(indexCol == position[1]) and (indexRow == position[0]) and not found:
+                    output += "A"
+                    found = True
+            if not found:
+                output += "."
+        print(output)
+
+def part_two(positions):
+    sum = 0
+    validPositions = []
+    for position in positions:
+        print("")
+        print("")
+        print("new position: ",position)
+        getSurroundingCharacters(position)
+        if getSurroundingCharacters(position) == True:
+            validPositions.append(position)
+            sum +=1
+    return sum,validPositions
+
+x_positions = getCharacterPositions(r"X")
+solution_one = part_one(x_positions)
+
+print("Solution Part one:" ,solution_one)
+
+
+a_positions = getCharacterPositions(r"A")
+solution_two,pos = part_two(a_positions)
+
+visual_part_two(pos)
+
+print("Solution Part two:" ,solution_two)
