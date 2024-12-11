@@ -44,7 +44,24 @@ def addDirectionToPosition(localposition,direction):
         return newposition
     else:
         return localposition
-
+    
+def rotate(direction):
+    if direction == [-1,0]:
+        direction = [0,1]
+        sign = ">"
+    else:
+        if direction == [0,1]:
+            direction = [1,0]
+            sign = "v"
+        else:
+            if direction == [1,0]:
+                direction = [0,-1]
+                sign = "<"
+            else:
+                if direction == [0,-1]:
+                    direction = [-1,0]
+                    sign = "^"
+    return direction,sign
 allXPositions = []
 
 playerInitDirection = [-1,0]
@@ -61,12 +78,21 @@ for indexRow,line in enumerate(lines):
         print(playerPosition)
         break
 
+currentDirection = playerInitDirection
+currentPlayerSign = "^"
 while(playerPosition[0] > 0):
-    playerPosition = addDirectionToPosition(playerPosition,playerInitDirection)
-    print(playerPosition)
-
-    nextChar = getCharFromPosition(addDirectionToPosition(playerPosition,playerInitDirection),lines)
+    nextChar = getCharFromPosition(addDirectionToPosition(playerPosition,currentDirection),lines)
     print(nextChar)
+
+    if (nextChar != ".") and (nextChar != "X"):
+        currentDirection,currentPlayerSign = rotate(currentDirection)
+    else:
+        print("update old player position to .")
+        #lines[playerPosition[0]][playerPosition[1]] = "."
+    playerPosition = addDirectionToPosition(playerPosition,currentDirection)
+    print(playerPosition)
+    #lines[playerPosition[0]][playerPosition[1]] = currentPlayerSign
+    print("update new player position to ",currentPlayerSign)
 
 
 
