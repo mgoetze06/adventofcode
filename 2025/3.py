@@ -5,7 +5,7 @@ with open('input\\3_val.txt') as f:
     lines = f.read().splitlines()
 print("total rows: ",len(lines))
 
-def findIndexOfBiggestNumberInString(string):
+def findIndexOfBiggestDigitInString(string):
     n = 1
     parts = [int(string[i:i+n]) for i in range(0, len(string), n)]
     index = string.index(str(max(parts)))
@@ -16,10 +16,10 @@ def day3_part1(lines):
     for row,line in enumerate(lines):
         stringWithoutLastChar = line[:len(line)-1]
 
-        indexFirstChar = findIndexOfBiggestNumberInString(stringWithoutLastChar)
+        indexFirstChar = findIndexOfBiggestDigitInString(stringWithoutLastChar)
         biggestFirstChar = stringWithoutLastChar[indexFirstChar]
         remainingString = line[indexFirstChar+1:]
-        indexSecondChar = findIndexOfBiggestNumberInString(remainingString)
+        indexSecondChar = findIndexOfBiggestDigitInString(remainingString)
         biggestSecondChar = line[indexSecondChar]
 
         joltage = int(str(biggestFirstChar+biggestSecondChar))
