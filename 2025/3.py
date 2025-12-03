@@ -4,7 +4,7 @@ import re
 
 debug = False
 
-with open('input\\3_val.txt') as f:
+with open('input\\3.txt') as f:
     lines = f.read().splitlines()
 print("total rows: ",len(lines))
 
@@ -36,67 +36,23 @@ def day3_part1(lines):
 
     print(totalJoltage)
 
-def deaktiviereStringErmittleMaximum(deaktiviert_Index, stringToCheck):
-    maxValue = 0
-    originalString = stringToCheck
-    if len(deaktiviert_Index)==0:
-        return 0
-    charToReplace = stringToCheck[deaktiviert_Index[0]]
-    string = "0"
-    for performReplacement in range(1,len(deaktiviert_Index)):
-        string = originalString.replace(charToReplace,'',performReplacement)
-        #print(string)
-        if len(string)<12:
-            return 0
-        if len(string)==12:
-            break
-        
-        if len(string)>12:
-            string = string[0:12]
-
-        value = int(string)
-        if value > maxValue:
-            maxValue = value
-    value = int(string)
-    if value > maxValue:
-        maxValue = value
-    return maxValue
-
-
-
 def day3_part2(lines):
     totalJoltage = 0
+    outputSize = 12
     for line in lines:
-        print("")
-        print("neue Zeile:" , line)
-        maxValue = 0
-        for i in range(9,0,-1):
-            print("")
-            print("startpunktNum",i)
-            startpunkte = [match.start() for match in re.finditer(str(i), line)]
-            startpunkte.sort(reverse=True)
-            print("startpunkte: ",startpunkte)
-            for startpunkt in startpunkte:
-                stringToCheck = line[startpunkt:]
-                for deaktiviertesDigit in range(1,9):
-                    deaktiviert = [match.start() for match in re.finditer(str(deaktiviertesDigit), stringToCheck)]
-                    value = deaktiviereStringErmittleMaximum(deaktiviert,stringToCheck)
-                    if value > maxValue:
-                        maxValue = value
-                        print("maxvalue: ",maxValue)
-        totalJoltage += maxValue
-    
+        leftBorder = 0
+        rightBorder = 0
+        outputString = ""
+        for pick in range(outputSize):
+            rightBorder = len(line) - outputSize + pick + 1
+            window = line[leftBorder:rightBorder]
+            index = findIndexOfBiggestDigitInString(window)
+            digitPick = line[index+leftBorder]
+            leftBorder = leftBorder + index + 1
+            outputString = outputString + digitPick
+        totalJoltage = totalJoltage + int(outputString)
     print(totalJoltage)
     return
 
-#day3_part2 notes
-# 12 digit output
-# start checking at biggest digit, where more than 11 chars to the right
-# always only check to the right
-# start with lowest digit in remaining string
-#   disable from start to the right only this digit
-#    
-
-
-#day3_part1(lines)
+day3_part1(lines)
 day3_part2(lines)
