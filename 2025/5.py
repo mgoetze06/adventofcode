@@ -54,7 +54,7 @@ def day5_part1(lines):
             rule = [int(x) for x in line.split("-")]
             rules.append(rule)
         else:
-            if line != None:
+            if line != None and line != "":
                 ingredients.append(int(line))
 
     validIngredients = 0
@@ -68,7 +68,33 @@ def day5_part1(lines):
     return
 
 def day5_part2(lines):
+    ingredients = []
+    rules = []
+    for line in lines:
+        line = line.strip()
+        if "-" in line:
+            rule = [int(x) for x in line.split("-")]
+            rules.append(rule)
+        else:
+            if line != None and line != "":
+                ingredients.append(int(line))
 
+    validIngredients = 0
+    validRanges = []
+    for id,rule in enumerate(rules):
+        lowerEdge = rule[0]
+        higherEdge = rule[1]
+        if len(validRanges) == 0:
+            validRanges.append(rule)
+        for validRange in validRanges:
+            if lowerEdge < validRange[1]:
+                newLowerEdge = validRange[1]
+            if higherEdge > validRange[0]:
+                newHigherEdge = validRange[0]
+        
+
+
+    print(validIngredients)
     return
 
 day5_part1(lines)
