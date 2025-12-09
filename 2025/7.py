@@ -106,42 +106,32 @@ def findRight(root,lines):
 
 def DFS(root):
   #depth first search
-  if root == None:
-      return
-  print("Visiting node: ",root.val)
-  DFS(root.left)
-  DFS(root.right)
+    global totalPaths
+    if root == None:
+        totalPaths += 1
+        return
 
+    print("Visiting node: ",root.val)
+    DFS(root.left)
+    DFS(root.right)
+
+def search(root):
+    if root == None:
+        return
+    root.left = findLeft(root,lines)
+    search(root.left)
+    root.right = findRight(root,lines)
+    search(root.right)
 
 def day7_part2(lines):
     currentRow = 0
+    global totalPaths
     totalPaths = 0
     startingPoint = findStartingPoint(lines[currentRow])
     globalRoot = Node([0,startingPoint[0]],None)
-    globalRoot.left = findLeft(globalRoot,lines)
-    root = globalRoot.left
-    foundEnd = False
-    while foundEnd == False:
-        if root.left == None:
-            root.left = findLeft(root,lines)
-            if root.left == None:
-                root.right = findRight(root,lines)
-        else:
-            root.right = findRight(root,lines)
-        if root.left == None and root.right == None:
-            root = root.parent
-            if root == None:
-                foundEnd = True
-        else:
-            if root.left != None:
-                root = root.left
-            else:
-                if root.right != None:
-                    root = root.right
-        #    totalPaths += 1
-        #root = findRight(root,lines)
-    print(globalRoot)
+    search(globalRoot)
     DFS(globalRoot)
+    print(totalPaths)
     return
 
 day7_part1(lines)
