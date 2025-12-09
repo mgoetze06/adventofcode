@@ -4,7 +4,7 @@ import re
 
 debug = False
 
-with open('input\\7.txt') as f:
+with open('input\\7_val.txt') as f:
     lines = f.read().splitlines()
 print("total rows: ",len(lines))
 
@@ -66,8 +66,82 @@ def day7_part1(lines):
             #print("newbeams: ",beamPositions)
         currentRow += 1
     print(total)
-def day7_part2(lines):
 
+class Node:
+    def __init__(self, key, parent):
+        self.parent = parent
+        self.left = None
+        self.right = None
+        self.val = key
+        print("new node: ",self.val)
+
+    def printNode(self):
+        print(self.val)
+
+def findLeft(root,lines):
+    print("finding left neigh of",root.val)
+    if root.val[0] + 1 >= len(lines):
+        return None
+    if root.val[1] - 1 < 0:
+        return None
+    newNodeValueRow = root.val[0] + 1
+    while lines[newNodeValueRow][root.val[1]-1] != "^":
+        newNodeValueRow += 1
+        if newNodeValueRow >= len(lines):
+            break
+    return Node([newNodeValueRow,root.val[1]-1],root)
+def findRight(root,lines):
+    print("finding right neigh of",root.val)
+    if root.val[0] + 1 >= len(lines):
+        return None
+    if root.val[1] + 1 >= len(lines[0]):
+        return None
+    newNodeValueRow = root.val[0] + 1
+    while lines[newNodeValueRow][root.val[1]+1] != "^":
+        #print(lines[newNodeValueRow])
+        newNodeValueRow += 1
+        if newNodeValueRow >= len(lines):
+            break
+    return Node([newNodeValueRow,root.val[1]+1],root)
+
+def DFS(root):
+  #depth first search
+  if root == None:
+      return
+  print("Visiting node: ",root.val)
+  DFS(root.left)
+  DFS(root.right)
+
+
+def day7_part2(lines):
+    currentRow = 0
+    totalPaths = 0
+    startingPoint = findStartingPoint(lines[currentRow])
+    globalRoot = Node([0,startingPoint[0]],None)
+    globalRoot.left = findLeft(globalRoot,lines)
+    root = globalRoot.left
+    foundEnd = False
+    while foundEnd == False:
+        if root.left == None:
+            root.left = findLeft(root,lines)
+            if root.left == None:
+                root.right = findRight(root,lines)
+        else:
+            root.right = findRight(root,lines)
+        if root.left == None and root.right == None:
+            root = root.parent
+            if root == None:
+                foundEnd = True
+        else:
+            if root.left != None:
+                root = root.left
+            else:
+                if root.right != None:
+                    root = root.right
+        #    totalPaths += 1
+        #root = findRight(root,lines)
+    print(globalRoot)
+    DFS(globalRoot)
     return
 
 day7_part1(lines)
