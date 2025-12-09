@@ -4,7 +4,7 @@ import re
 
 debug = False
 
-with open('input\\7_val.txt') as f:
+with open('input\\7.txt') as f:
     lines = f.read().splitlines()
 print("total rows: ",len(lines))
 
@@ -73,13 +73,13 @@ class Node:
         self.left = None
         self.right = None
         self.val = key
-        print("new node: ",self.val)
+        #print("new node: ",self.val)
 
     def printNode(self):
         print(self.val)
 
 def findLeft(root,lines):
-    print("finding left neigh of",root.val)
+    #print("finding left neigh of",root.val)
     if root.val[0] + 1 >= len(lines):
         return None
     if root.val[1] - 1 < 0:
@@ -91,7 +91,7 @@ def findLeft(root,lines):
             break
     return Node([newNodeValueRow,root.val[1]-1],root)
 def findRight(root,lines):
-    print("finding right neigh of",root.val)
+    #print("finding right neigh of",root.val)
     if root.val[0] + 1 >= len(lines):
         return None
     if root.val[1] + 1 >= len(lines[0]):
@@ -107,11 +107,10 @@ def findRight(root,lines):
 def DFS(root):
   #depth first search
     global totalPaths
-    if root == None:
+    if root.right == None:
         totalPaths += 1
         return
-
-    print("Visiting node: ",root.val)
+    #print("Visiting node: ",root.val)
     DFS(root.left)
     DFS(root.right)
 
