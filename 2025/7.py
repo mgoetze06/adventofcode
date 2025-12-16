@@ -4,7 +4,7 @@ import re
 
 debug = False
 
-with open('input\\7.txt') as f:
+with open('input/7.txt') as f:
     lines = f.read().splitlines()
 print("total rows: ",len(lines))
 
@@ -73,6 +73,8 @@ class Node:
         self.right = None
         self.val = key
         #print("new node: ",self.val)
+        self.newBeamsBehindThisNode = 0
+        self.visited = False
 
     def printNode(self):
         print(self.val)
@@ -110,14 +112,26 @@ def updateRootInNodes(root,nodes):
     nodes.append(root)
     return nodes
 def DFS(root):
+    global totalPaths, nodes
   #depth first search
-    global totalPaths
+    if root.visited:
+        print("already visited, node: ",root.val)
+        totalPaths += root.newBeamsBehindThisNode
+        print("adding", root.newBeamsBehindThisNode)
+        return
+    
     if root.left == None and root.right == None:
-        totalPaths += 1
+        #totalPaths += 1
+        print("Visiting node wih nothing below: ",root.val)
+        print("nothing below, this is a resulting beam")
+        root.newBeamsBehindThisNode = 1
         return
     print("Visiting node: ",root.val)
     DFS(root.left)
     DFS(root.right)
+    root.visited = True
+    root.newBeamsBehindThisNode = root.left.newBeamsBehindThisNode + root.right.newBeamsBehindThisNode 
+    nodes = updateRootInNodes(root,nodes)
 
 def search(root):
     global nodes
